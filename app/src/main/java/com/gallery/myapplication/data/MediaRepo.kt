@@ -6,16 +6,14 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import androidx.collection.ArrayMap
-import androidx.collection.arrayMapOf
 import com.gallery.myapplication.domain.MediaItem
 import kotlinx.coroutines.flow.flow
 
 class MediaRepository(private val application: Application) {
 
 
-    suspend fun fetchMedia() = flow<ArrayMap<String, MutableList<MediaItem>>> {
-        val mediaMap = arrayMapOf<String, MutableList<MediaItem>>()
+    suspend fun fetchMedia() = flow {
+        val mediaMap = mutableListOf<MediaItem>()
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
             MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -46,7 +44,7 @@ class MediaRepository(private val application: Application) {
 
                 val mediaItem = MediaItem(uri, fileName, folderName)
 
-                mediaMap.getOrPut(folderName) { mutableListOf() }.add(mediaItem)
+                mediaMap.add(mediaItem)
             }
         }
         emit(mediaMap)

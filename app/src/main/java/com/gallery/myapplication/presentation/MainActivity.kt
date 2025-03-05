@@ -92,13 +92,13 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun GalleryScreen(viewModel: MyGalleryViewModel) {
-        val mediaItems by viewModel.mediaItems.collectAsState()
+        val folderItems by viewModel.mediaItems.collectAsState()
         Column {
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                items(mediaItems.size) { index ->
-                    val folderName = mediaItems.keyAt(index)
-                    val fileList = mediaItems[folderName]
-                    FolderItem(folderName, fileList!!)
+                items(folderItems.size) { index ->
+                    val folderName = folderItems[index].folderName
+                    val fileList = folderItems[index].fileList
+                    FolderItem(folderName, fileList)
                 }
             }
         }
@@ -111,12 +111,12 @@ class MainActivity : ComponentActivity() {
             shape = RoundedCornerShape(8.dp)
         ) {
             AsyncImage(
-                model = fileList[0].uri, contentDescription = "Picture",
+                model = fileList[0].uri, contentDescription = "Media",
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop
             )
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = fileList[0].folderName,
+                    text = folderName,
                     style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(8.dp)
                 )
                 Text(
