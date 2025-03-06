@@ -12,12 +12,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class MyGalleryViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = MediaRepository(application)
     private val _mediaItems =
         MutableStateFlow<List<GalleryItem>>(mutableListOf())
     val mediaItems = _mediaItems.asStateFlow()
+
+
+    private val _fileItems =
+        MutableStateFlow<List<MediaItem>>(mutableListOf())
+    val fileItems = _fileItems.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -31,10 +38,22 @@ class MyGalleryViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun getFileItems(folderId: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val filesItem = mediaItems.value.filter { it.folderId == folderId }
+                Log.d("MyGalleryViewModel", "fileItems: ${filesItem[0].fileList.size}")
+                _fileItems.emit(filesItem.flatMap { it.fileList })
+            }
+
+        }
+    }
+
+
     private fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
         return this.groupBy { it.folderName }
             .map { (folderName, mediaItems) ->
-                GalleryItem(folderName, mediaItems.toMutableList())
+                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
             }
     }
 
@@ -47,7 +66,7 @@ class MyGalleryViewModel(application: Application) : AndroidViewModel(applicatio
         } // Add other image extensions as needed
             .groupBy { "All Images" }
             .map { (folderName, mediaItems) ->
-                GalleryItem(folderName, mediaItems.toMutableList())
+                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
             }
     }
 
@@ -63,7 +82,7 @@ class MyGalleryViewModel(application: Application) : AndroidViewModel(applicatio
         } // Add other video extensions as needed.
             .groupBy { "All Videos" }
             .map { (folderName, mediaItems) ->
-                GalleryItem(folderName, mediaItems.toMutableList())
+                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
             }
     }
 }

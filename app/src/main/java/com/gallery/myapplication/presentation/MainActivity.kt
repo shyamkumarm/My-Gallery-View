@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -30,6 +32,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -89,30 +94,57 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun GalleryScreen(viewModel: MyGalleryViewModel) {
         val folderItems by viewModel.mediaItems.collectAsState()
-        Column {
-            LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                items(folderItems.size) { index ->
-                    val folderName = folderItems[index].folderName
-                    val fileList = folderItems[index].fileList
-                    FolderItem(folderName, fileList)
+        val fileItems by viewModel.fileItems.collectAsState()
+        var selectedFolder by remember {
+            mutableIntStateOf(0)
+        }
+        if (selectedFolder == 0) {
+            Column {
+                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                    items(folderItems.size) { index ->
+                        val folderName = folderItems[index].folderName
+                        val fileList = folderItems[index].fileList
+                        FolderItem(folderName, fileList) {
+                            selectedFolder = 1
+                            viewModel.getFileItems(folderItems[index].folderId)
+                        }
+                    }
+                }
+            }
+        } else {
+            Column {
+                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                    items(items = fileItems) { it ->
+                        FileItem(it) {
+                        }
+                    }
                 }
             }
         }
     }
 
+
     @Composable
-    fun FolderItem(folderName: String, fileList: MutableList<MediaItem>) {
+    fun FolderItem(
+        folderName: String,
+        fileList: MutableList<MediaItem>,
+        onFolderClick: () -> Unit
+    ) {
         Card(
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier
+                .padding(4.dp),
             shape = RoundedCornerShape(8.dp)
         ) {
             AsyncImage(
-                model = fileList[0].uri, contentDescription = "Media",
-                Modifier.fillMaxSize(), contentScale = ContentScale.Crop
+                model = fileList[0].uri,
+                contentDescription = "Media",
+                Modifier
+                    .fillMaxSize()
+                    .clickable { onFolderClick() },
+                contentScale = ContentScale.Crop
             )
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -127,6 +159,33 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    @Composable
+    fun FileItem(
+        mediaItem: MediaItem,
+        onFolderClick: () -> Unit
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(4.dp),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            AsyncImage(
+                model = mediaItem.uri,
+                contentDescription = "Media",
+                Modifier
+                    .fillMaxSize()
+                    .clickable { onFolderClick() },
+                contentScale = ContentScale.Crop
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = mediaItem.fileName,
+                    style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
+    }
 
 
     @Preview(showBackground = true)
