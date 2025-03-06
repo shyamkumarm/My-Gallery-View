@@ -7,13 +7,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.gallery.myapplication.FileUiState
+import com.gallery.myapplication.FolderUiState.Error
+import com.gallery.myapplication.FolderUiState.Success
 import com.gallery.myapplication.presentation.MyGalleryViewModel
 import kotlinx.serialization.Serializable
 
 @Composable
 fun MyNavigationScreen(
     viewModel: MyGalleryViewModel,
-    modifier: Modifier  = Modifier
+    modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
     val folderItems by viewModel.mediaItems.collectAsState()
@@ -25,25 +29,43 @@ fun MyNavigationScreen(
     ) {
         composable<MyGalleryScreen.FolderScreen>(
         ) {
-            FolderListScreen(fileItems = folderItems) { selectedFolder ->
-                viewModel.getFileItems(selectedFolder)
-                navController.navigate(MyGalleryScreen.FileScreen)
+            when (folderItems) {
+                is Success -> {
+                    FolderListScreen(fileItems = (folderItems as Success).galleryItem)
+                    { selectedFolder, selectedId ->
+
+                        viewModel.getFileItems(selectedId)
+                        navController.navigate(MyGalleryScreen.FileScreen(selectedFolder))
+                    }
+                }
+
+                is Error -> ShowErrorContent(folderItems)
+                else -> ShowLoading()
             }
+
         }
         composable<MyGalleryScreen.FileScreen>() {
-            FileListScreen(fileItems = fileItems)
+            when (fileItems) {
+                is FileUiState.Success -> {
+                    val folderName = it.toRoute<MyGalleryScreen.FileScreen>().folderName
+                    FileListScreen(folderName,fileItems = (fileItems as FileUiState.Success).mediaItem)
+                }
+
+                is FileUiState.Error -> ShowErrorContent(folderItems)
+                else -> ShowLoading()
+            }
+
         }
 
     }
 }
-
 
 sealed class MyGalleryScreen {
     @Serializable
     data object FolderScreen : MyGalleryScreen()
 
     @Serializable
-    data object FileScreen : MyGalleryScreen()
+    data class FileScreen(val folderName: String) : MyGalleryScreen()
 }
 
 

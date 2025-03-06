@@ -1,24 +1,27 @@
 package com.gallery.myapplication.domain
 
-import com.gallery.myapplication.utils.TransformUtils.transformToFolderItems
-import com.gallery.myapplication.utils.TransformUtils.transformToImageItems
-import com.gallery.myapplication.utils.TransformUtils.transformToVideoItems
+import com.gallery.myapplication.FileUiState
+import com.gallery.myapplication.FolderUiState
+import com.gallery.myapplication.utils.TransformUtils.transformToAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class MediaUseCase(private val mediaRepo: IMediaFile) {
-    fun getFolderItems() = flow {
-        val folderItem = mediaRepo.fetchMedia().run {
-            transformToImageItems() + transformToVideoItems() + transformToFolderItems()
-        }
-        emit(folderItem)
+    fun getFolderItems() = flow<FolderUiState> {
+        val mediaItem = mediaRepo.fetchMedia().fold(
+            onSuccess = { mediaItem ->
+                FolderUiState.Success(mediaItem.transformToAll())
+            }, onFailure = { exception ->
+                FolderUiState.Error(exception.message ?: "Some thing wrong with media cursor")
+            })
+        emit(mediaItem)
     }.flowOn(Dispatchers.IO)
 
 
     fun getFileItems(galleryItems: List<GalleryItem>, folderId: String) = flow {
         val filesItem = galleryItems.filter { it.folderId == folderId }
-        emit(filesItem.flatMap { it.fileList })
+        emit(FileUiState.Success(filesItem.flatMap { it.fileList }))
     }.flowOn(Dispatchers.IO)
 
 }

@@ -6,7 +6,7 @@ import com.gallery.myapplication.domain.MediaItem
 class MediaRepo(private val source: MediaSource) : IMediaFile {
 
 
-    override suspend fun fetchMedia(): List<MediaItem> {
+    override suspend fun fetchMedia(): Result<List<MediaItem>> {
         return source.fetchMediaSource()
     }
 }

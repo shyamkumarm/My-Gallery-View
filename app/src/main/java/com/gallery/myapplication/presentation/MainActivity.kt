@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
                             CoilImageLoader.getAsyncImageLoader(context)
                         }
                         MyApplicationTheme() {
-
                             Scaffold(topBar = { TopAppBarDefaults() }) { innerPadding ->
                                 Surface(
                                     modifier = Modifier
