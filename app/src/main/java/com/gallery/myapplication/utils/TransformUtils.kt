@@ -17,8 +17,8 @@ object TransformUtils {
         return this.filter {
             it.fileName.endsWith(".jpg", ignoreCase = true) ||
                     it.fileName.endsWith(".jpeg", ignoreCase = true) ||
-                    it.fileName.endsWith(".png", ignoreCase = true) ||
-                    it.fileName.endsWith(".gif", ignoreCase = true)
+                    it.fileName.endsWith(".png", ignoreCase = true) /*||
+                    it.fileName.endsWith(".gif", ignoreCase = true)*/
         } // Add other image extensions as needed
             .groupBy { "All Images" }
             .map { (folderName, mediaItems) ->

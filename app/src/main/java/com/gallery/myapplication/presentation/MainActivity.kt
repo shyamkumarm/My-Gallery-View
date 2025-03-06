@@ -23,8 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import coil3.compose.setSingletonImageLoaderFactory
 import com.gallery.myapplication.R
 import com.gallery.myapplication.presentation.screen.MyNavigationScreen
+import com.gallery.myapplication.utils.CoilImageLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -36,14 +38,18 @@ class MainActivity : ComponentActivity() {
                 if (granted) {
                     setContent {
                         val viewModel:MyGalleryViewModel by viewModel()
+                        setSingletonImageLoaderFactory { context ->
+                            CoilImageLoader.getAsyncImageLoader(context)
+                        }
                         MaterialTheme {
+
                             Scaffold(topBar = { TopAppBarDefaults() }) { innerPadding ->
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(innerPadding)
                                 ) {
-                                    MyNavigationScreen(viewModel)
+                                    MyNavigationScreen(viewModel,Modifier)
                                 }
                             }
                         }
