@@ -1,7 +1,6 @@
 package com.gallery.myapplication.presentation
 
 import android.Manifest
-import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,11 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gallery.myapplication.R
 import com.gallery.myapplication.presentation.screen.MyNavigationScreen
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 val granted = permissions.values.all { it }
                 if (granted) {
                     setContent {
+                        val viewModel:MyGalleryViewModel by viewModel()
                         MaterialTheme {
                             Scaffold(topBar = { TopAppBarDefaults() }) { innerPadding ->
                                 Surface(
@@ -45,9 +43,6 @@ class MainActivity : ComponentActivity() {
                                         .fillMaxSize()
                                         .padding(innerPadding)
                                 ) {
-                                    val viewModel = viewModel<MyGalleryViewModel>(
-                                        factory = MyGalleryViewModelFactory(application)
-                                    )
                                     MyNavigationScreen(viewModel)
                                 }
                             }
@@ -63,17 +58,6 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             )
-        }
-    }
-
-    class MyGalleryViewModelFactory(private val application: Application) :
-        ViewModelProvider.AndroidViewModelFactory(application) {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MyGalleryViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return MyGalleryViewModel(application) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 

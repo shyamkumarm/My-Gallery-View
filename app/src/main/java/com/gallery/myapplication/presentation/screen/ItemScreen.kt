@@ -15,15 +15,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.request.crossfade
+import coil3.video.VideoFrameDecoder
 import com.gallery.myapplication.domain.GalleryItem
 import com.gallery.myapplication.domain.MediaItem
 
 
 @Composable
 fun FolderListScreen(fileItems: List<GalleryItem>, onFolderClick: (String) -> Unit) {
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+    LazyVerticalGrid(columns = GridCells.Adaptive(128.dp)) {
         items(items = fileItems, key = { it.folderId }) { it ->
             FolderItem(it.folderName, it.fileList) {
                 onFolderClick(it.folderId)
@@ -34,7 +38,7 @@ fun FolderListScreen(fileItems: List<GalleryItem>, onFolderClick: (String) -> Un
 
 @Composable
 fun FileListScreen(fileItems: List<MediaItem>) {
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+    LazyVerticalGrid(columns = GridCells.Adaptive(128.dp)) {
         items(items = fileItems) {
             FileItem(it) {
                 // event required when item clicked
@@ -55,13 +59,15 @@ fun FolderItem(
             .clickable { onMediaItemClick() },
         shape = RoundedCornerShape(8.dp)
     ) {
-        AsyncImage(
-            model = fileList[0].uri,
-            contentDescription = "Media",
-            Modifier
-                .fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        val imageLoader =
+            AsyncImage(
+                model = fileList[0].uri,
+                contentDescription = "Media",
+                imageLoader = getImageLoader(),
+                Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = folderName,
@@ -74,7 +80,6 @@ fun FolderItem(
         }
     }
 }
-
 
 @Composable
 fun FileItem(
@@ -90,6 +95,7 @@ fun FileItem(
         AsyncImage(
             model = mediaItem.uri,
             contentDescription = "Media",
+            imageLoader = getImageLoader(),
             Modifier
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -102,3 +108,10 @@ fun FileItem(
         }
     }
 }
+
+@Composable
+private fun getImageLoader() = ImageLoader.Builder(LocalContext.current)
+    .components {
+        add(VideoFrameDecoder.Factory())
+    }.crossfade(true)
+    .build()
