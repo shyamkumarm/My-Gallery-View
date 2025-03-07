@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -58,11 +58,11 @@ fun FolderListScreen(
         mutableStateOf(false)
     }
     Column {
-        TitleScreen() {
+        TitleScreen {
             isList = !isList
         }
         LazyVerticalGrid(columns = GridCells.Fixed(if (isList) 1 else 3), modifier) {
-            items(items = fileItems, key = { it.folderId }) { it ->
+            items(items = fileItems, key = { it.folderId }) {
                 FolderItem(it.folderName, it.fileList) {
                     onFolderClick(it.folderName, it.folderId)
                 }
@@ -106,8 +106,8 @@ fun TitleScreen(label: String = stringResource(id = R.string.app_name), onViewCh
         IconButton(onClick = { onViewChange() }) {
             Icon(
                 modifier = Modifier.weight(1f),
-                imageVector = Icons.Default.List,
-                contentDescription = "Localized description"
+                imageVector = Icons.AutoMirrored.Filled.List,
+                contentDescription = stringResource(R.string.icon_button_desc)
             )
         }
     }
@@ -117,13 +117,13 @@ fun TitleScreen(label: String = stringResource(id = R.string.app_name), onViewCh
 fun FolderItem(
     folderName: String,
     fileList: List<MediaItem>,
-    onMediaItemClick: () -> Unit
+    onFolderItemClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        CardImageScreen(onMediaItemClick, fileList[0])
+        CardImageScreen(onFolderItemClick, fileList[0])
         val mTextModifier = Modifier
             .align(Alignment.Start)
             .padding(start = 8.dp)
@@ -141,27 +141,27 @@ fun FolderItem(
 
 @Composable
 private fun CardImageScreen(
-    onMediaItemClick: () -> Unit,
+    onItemClick: () -> Unit,
     file: MediaItem
 ) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .clickable { onMediaItemClick() }
+            .clickable { onItemClick() }
             .aspectRatio(1f),
         shape = RoundedCornerShape(8.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             AsyncImage(
                 model = file.uri,
-                contentDescription = "Media",
+                contentDescription = stringResource(R.string.media),
                 contentScale = ContentScale.Crop,
             )
             if (!file.fileName.isImageFile()) {
                 Icon(
                     tint = Color.White,
                     imageVector = Icons.TwoTone.PlayArrow,
-                    contentDescription = null, modifier = Modifier.size(29.dp)
+                    contentDescription = null, modifier = Modifier.size(34.dp)
                 )
             }
         }
@@ -198,11 +198,10 @@ fun ShowLoading() {
     }
 }
 
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun ShowErrorContent(
     modifier: Modifier = Modifier,
-    errorMessage: String = "Error Message!",
+    errorMessage: String = stringResource(R.string.error_message),
 ) {
     Box(
         modifier
@@ -220,7 +219,7 @@ fun ShowErrorContent(
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun FolderListPreview(
+fun ListPreview(
     fileItems: List<GalleryItem> = listOf(
         GalleryItem(
             folderId = "1", folderName = "All Images",

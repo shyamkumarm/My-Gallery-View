@@ -9,9 +9,9 @@ val requestViewModel = module {
     viewModel { MyGalleryViewModel(get()) }
 }
 
-private val appModule = module {
+/*private val appModule = module {
     single { } // app utils if any
 
-}
+}*/
 
 val presentationModules = listOf(requestViewModel)

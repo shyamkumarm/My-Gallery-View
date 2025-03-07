@@ -10,10 +10,10 @@ object TransformUtils {
         return this.transformToImageItems() + this.transformToVideoItems() + this.transformToFolderItems()
     }
 
-    private fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
+    public fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
         return this.groupBy { it.folderPath }
-            .map { (folderId, mediaItems) ->
-                GalleryItem(UUID.randomUUID().toString(), mediaItems[0].folderName, mediaItems.toMutableList())
+            .map { (folderPath, mediaItems) ->
+                GalleryItem(folderPath, mediaItems[0].folderName, mediaItems.toMutableList())
             }
     }
 
@@ -44,7 +44,7 @@ object TransformUtils {
     // Add other image extensions as needed
 
 
-    fun String.isVideoFile() =
+   private fun String.isVideoFile() =
         this.endsWith(
             ".mp4",
             ignoreCase = true

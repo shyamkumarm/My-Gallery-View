@@ -9,12 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import coil3.compose.setSingletonImageLoaderFactory
+import com.gallery.myapplication.R
 import com.gallery.myapplication.presentation.screen.MyNavigationScreen
 import com.gallery.myapplication.presentation.screen.ShowErrorContent
 import com.gallery.myapplication.ui.theme.MyApplicationTheme
 import com.gallery.myapplication.utils.CoilImageLoader
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,14 +29,13 @@ class MainActivity : ComponentActivity() {
                         setSingletonImageLoaderFactory { context ->
                             CoilImageLoader.getAsyncImageLoader(context)
                         }
-                        MyApplicationTheme() {
-                            val viewModel: MyGalleryViewModel by viewModel()
-                            Scaffold() { padding ->
-                                MyNavigationScreen(viewModel, Modifier.padding(padding))
+                        MyApplicationTheme {
+                            Scaffold { padding ->
+                                MyNavigationScreen(viewModel = koinViewModel(), Modifier.padding(padding))
                             }
                         }
                     } else {
-                        ShowErrorContent(errorMessage = "Oops! Permission Denied, Close the Application, Go to Setting, Enable the Permission")
+                        ShowErrorContent(errorMessage = stringResource(R.string.permission_error))
                     }
                 }
             }

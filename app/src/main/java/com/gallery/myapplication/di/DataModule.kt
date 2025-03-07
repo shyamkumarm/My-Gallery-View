@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.di_modules
+package com.gallery.myapplication.di
 
 import com.gallery.myapplication.data.MediaRepo
 import com.gallery.myapplication.data.MediaSource

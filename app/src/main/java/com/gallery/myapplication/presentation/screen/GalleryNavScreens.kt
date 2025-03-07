@@ -27,8 +27,7 @@ fun MyNavigationScreen(
         startDestination = MyGalleryScreen.FolderScreen
 
     ) {
-        composable<MyGalleryScreen.FolderScreen>(
-        ) {
+        composable<MyGalleryScreen.FolderScreen> {
             when (folderItems) {
                 is Success -> {
                     FolderListScreen(fileItems = (folderItems as Success).galleryItem,modifier)
@@ -42,7 +41,7 @@ fun MyNavigationScreen(
             }
 
         }
-        composable<MyGalleryScreen.FileScreen>() {
+        composable<MyGalleryScreen.FileScreen> {
             when (fileItems) {
                 is FileUiState.Success -> {
                     val folderName = it.toRoute<MyGalleryScreen.FileScreen>().folderName

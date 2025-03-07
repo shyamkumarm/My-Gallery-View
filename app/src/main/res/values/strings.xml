@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">My Gallery View</string>
+    <string name="permission_error">Oops! Permission Denied, Close the Application, Go to Setting, Enable the Permission</string>
+    <string name="error_message">Error Message!</string>
+    <string name="media">Media</string>
+    <string name="icon_button_desc">icon button desc</string>
 </resources>
