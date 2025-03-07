@@ -1,6 +1,5 @@
 package com.gallery.myapplication.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gallery.myapplication.FileUiState
@@ -24,9 +23,6 @@ class MyGalleryViewModel(private val useCase: MediaUseCase) : ViewModel() {
     init {
         viewModelScope.launch {
             useCase.getFolderItems().collect { mediaState ->
-                Log.d("MyGalleryViewModel", "mediaItems: ${(mediaState as FolderUiState.Success).galleryItem.map { 
-                    "${it.folderId} -> ${it.folderName}"
-                }}")
                 _mediaItems.emit(mediaState)
             }
         }
@@ -40,7 +36,6 @@ class MyGalleryViewModel(private val useCase: MediaUseCase) : ViewModel() {
                     (mediaItems.value as FolderUiState.Success).galleryItem,
                     folderId
                 ).collect { fileItems ->
-                    Log.d("MyGalleryViewModel", "$folderId -> fileItems: ${fileItems.mediaItem}")
                     _fileItems.emit(fileItems)
                 }
             } catch (e: Exception) {

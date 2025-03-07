@@ -41,8 +41,9 @@ class MediaSource(private val application: Context) {
                     val filePath = it.getString(dataColumn)
                     val uri = MediaStore.Files.getContentUri("external", id)
                     val fileName = filePath.substringAfterLast("/")
-                    val folderName = filePath.substringBeforeLast("/").substringAfterLast("/")
-                    val mediaItem = MediaItem(uri, fileName, folderName)
+                    val folderPath = filePath.substringBeforeLast("/")
+                    val folderName = folderPath.substringAfterLast("/")
+                    val mediaItem = MediaItem(folderPath, uri, fileName, folderName)
                     mediaMap.add(mediaItem)
                 }
             }

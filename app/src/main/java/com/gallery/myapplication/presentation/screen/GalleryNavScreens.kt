@@ -33,7 +33,6 @@ fun MyNavigationScreen(
                 is Success -> {
                     FolderListScreen(fileItems = (folderItems as Success).galleryItem,modifier)
                     { selectedFolder, selectedId ->
-
                         viewModel.getFileItems(selectedId)
                         navController.navigate(MyGalleryScreen.FileScreen(selectedFolder))
                     }
@@ -66,6 +65,7 @@ fun MyNavigationScreen(
 sealed class MyGalleryScreen {
     @Serializable
     data object FolderScreen : MyGalleryScreen()
+
     @Serializable
     data class FileScreen(val folderName: String) : MyGalleryScreen()
 }

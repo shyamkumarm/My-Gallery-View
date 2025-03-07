@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,18 +18,25 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,36 +54,61 @@ fun FolderListScreen(
     modifier: Modifier,
     onFolderClick: (String, String) -> Unit
 ) {
-    /* Column {
-         Text(
-            " fileItems[0].folderName",
-             modifier = Modifier.padding(16.dp),
-             style = MaterialTheme.typography.titleLarge
-         )*/
-    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = modifier) {
-        items(items = fileItems, key = { it.folderId }) { it ->
-            FolderItem(it.folderName, it.fileList) {
-                onFolderClick(it.folderName, it.folderId)
+    var isList by rememberSaveable {
+        mutableStateOf(false)
+    }
+    Column {
+        TitleScreen() {
+            isList = !isList
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(if (isList) 1 else 3), modifier) {
+            items(items = fileItems, key = { it.folderId }) { it ->
+                FolderItem(it.folderName, it.fileList) {
+                    onFolderClick(it.folderName, it.folderId)
+                }
             }
         }
     }
-    // }
 }
 
 @Composable
-fun FileListScreen(folderName: String, fileItems: List<MediaItem>,modifier: Modifier) {
+fun FileListScreen(folderName: String, fileItems: List<MediaItem>, modifier: Modifier) {
+    var isList by rememberSaveable {
+        mutableStateOf(false)
+    }
     Column {
-        Text(
-            folderName,
-            modifier = modifier,
-            style = MaterialTheme.typography.titleLarge
-        )
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+        TitleScreen(folderName) {
+            isList = !isList
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(if (isList) 1 else 3), modifier) {
             items(items = fileItems) {
                 FileItem(it) {
                     // event required when item clicked
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TitleScreen(label: String = stringResource(id = R.string.app_name), onViewChange: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier
+                .padding(16.dp)
+                .weight(1f),
+            style = MaterialTheme.typography.titleLarge
+        )
+        IconButton(onClick = { onViewChange() }) {
+            Icon(
+                modifier = Modifier.weight(1f),
+                imageVector = Icons.Default.List,
+                contentDescription = "Localized description"
+            )
         }
     }
 }
@@ -166,10 +200,15 @@ fun ShowLoading() {
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun ShowErrorContent( modifier: Modifier = Modifier,
+fun ShowErrorContent(
+    modifier: Modifier = Modifier,
     errorMessage: String = "Error Message!",
 ) {
-    Box(modifier.padding(16.dp).fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier
+            .padding(16.dp)
+            .fillMaxSize(), contentAlignment = Alignment.Center
+    ) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = errorMessage,
@@ -186,7 +225,7 @@ fun FolderListPreview(
         GalleryItem(
             folderId = "1", folderName = "All Images",
             fileList = listOf(
-                MediaItem(
+                MediaItem("",
                     uri = Uri.parse("android.resource://" + LocalContext.current.packageName + "/" + R.drawable.ic_launcher_foreground),
                     fileName = "IMG_20210509_164609", folderName = "Camera"
                 )
@@ -196,7 +235,7 @@ fun FolderListPreview(
         GalleryItem(
             folderId = "2", folderName = "All Images",
             fileList = listOf(
-                MediaItem(
+                MediaItem("",
                     uri = Uri.parse("android.resource://" + LocalContext.current.packageName + "/" + R.drawable.ic_launcher_background),
                     fileName = "IMG_20210509_164609", folderName = "Camera"
                 )
@@ -206,7 +245,7 @@ fun FolderListPreview(
         GalleryItem(
             folderId = "3", folderName = "All files",
             fileList = listOf(
-                MediaItem(
+                MediaItem("",
                     uri = Uri.parse("android.resource://" + LocalContext.current.packageName + "/" + R.drawable.ic_launcher_foreground),
                     fileName = "IMG_20210509_164609.jpg", folderName = "Camera"
                 )
@@ -216,7 +255,7 @@ fun FolderListPreview(
         GalleryItem(
             folderId = "4", folderName = "All Images",
             fileList = listOf(
-                MediaItem(
+                MediaItem("",
                     uri = Uri.parse("android.resource://" + LocalContext.current.packageName + "/" + R.drawable.ic_launcher_foreground),
                     fileName = "IMG_20210509_164609", folderName = "Camera"
                 )
@@ -224,6 +263,6 @@ fun FolderListPreview(
         )
     )
 ) {
-    FolderListScreen(fileItems,Modifier) { _, _ ->
+    FolderListScreen(fileItems, Modifier) { _, _ ->
     }
 }

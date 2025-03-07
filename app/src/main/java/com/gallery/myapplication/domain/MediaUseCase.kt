@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class MediaUseCase(private val mediaRepo: IMediaFile) {
-    fun getFolderItems() = flow<FolderUiState> {
+    fun getFolderItems() = flow {
         val mediaItem = mediaRepo.fetchMedia().fold(
             onSuccess = { mediaItem ->
                 FolderUiState.Success(mediaItem.transformToAll())

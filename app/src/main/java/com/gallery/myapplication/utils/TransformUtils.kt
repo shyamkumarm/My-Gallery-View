@@ -11,9 +11,9 @@ object TransformUtils {
     }
 
     private fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
-        return this.groupBy { it.folderName }
-            .map { (folderName, mediaItems) ->
-                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
+        return this.groupBy { it.folderPath }
+            .map { (folderId, mediaItems) ->
+                GalleryItem(UUID.randomUUID().toString(), mediaItems[0].folderName, mediaItems.toMutableList())
             }
     }
 
