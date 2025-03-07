@@ -78,5 +78,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation (libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
 
 }

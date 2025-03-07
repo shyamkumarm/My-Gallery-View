@@ -4,27 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gallery.myapplication.domain.MediaUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MyGalleryViewModel(private val useCase: MediaUseCase) : ViewModel() {
 
-    private val _mediaItems =
-        MutableStateFlow<FolderUiState>(FolderUiState.Loading)
-    val mediaItems = _mediaItems.asStateFlow()
+
+    val mediaItems = flow {
+        useCase.getFolderItems().collect { mediaState ->
+            emit(mediaState)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FolderUiState.Loading)
 
 
     private val _fileItems =
         MutableStateFlow<FileUiState>(FileUiState.Loading)
     val fileItems = _fileItems.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            useCase.getFolderItems().collect { mediaState ->
-                _mediaItems.emit(mediaState)
-            }
-        }
-    }
 
     fun getFileItems(folderId: String) {
         viewModelScope.launch {
