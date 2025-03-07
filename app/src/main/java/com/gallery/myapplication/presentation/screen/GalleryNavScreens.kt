@@ -31,15 +31,14 @@ fun MyNavigationScreen(
         ) {
             when (folderItems) {
                 is Success -> {
-                    FolderListScreen(fileItems = (folderItems as Success).galleryItem)
+                    FolderListScreen(fileItems = (folderItems as Success).galleryItem,modifier)
                     { selectedFolder, selectedId ->
 
                         viewModel.getFileItems(selectedId)
                         navController.navigate(MyGalleryScreen.FileScreen(selectedFolder))
                     }
                 }
-
-                is Error -> ShowErrorContent(folderItems)
+                is Error -> ShowErrorContent(errorMessage = (folderItems as Error).message)
                 else -> ShowLoading()
             }
 
@@ -48,10 +47,14 @@ fun MyNavigationScreen(
             when (fileItems) {
                 is FileUiState.Success -> {
                     val folderName = it.toRoute<MyGalleryScreen.FileScreen>().folderName
-                    FileListScreen(folderName,fileItems = (fileItems as FileUiState.Success).mediaItem)
+                    FileListScreen(
+                        folderName = folderName,
+                        fileItems = (fileItems as FileUiState.Success).mediaItem
+                        ,modifier = modifier
+                    )
                 }
 
-                is FileUiState.Error -> ShowErrorContent(folderItems)
+                is FileUiState.Error -> ShowErrorContent(errorMessage = (fileItems as FileUiState.Error).message)
                 else -> ShowLoading()
             }
 
@@ -63,7 +66,6 @@ fun MyNavigationScreen(
 sealed class MyGalleryScreen {
     @Serializable
     data object FolderScreen : MyGalleryScreen()
-
     @Serializable
     data class FileScreen(val folderName: String) : MyGalleryScreen()
 }

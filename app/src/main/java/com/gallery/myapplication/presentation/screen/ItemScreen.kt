@@ -33,8 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.gallery.myapplication.FolderUiState
-import com.gallery.myapplication.FolderUiState.Error
 import com.gallery.myapplication.R
 import com.gallery.myapplication.domain.GalleryItem
 import com.gallery.myapplication.domain.MediaItem
@@ -44,6 +42,7 @@ import com.gallery.myapplication.utils.TransformUtils.isImageFile
 @Composable
 fun FolderListScreen(
     fileItems: List<GalleryItem>,
+    modifier: Modifier,
     onFolderClick: (String, String) -> Unit
 ) {
     /* Column {
@@ -52,7 +51,7 @@ fun FolderListScreen(
              modifier = Modifier.padding(16.dp),
              style = MaterialTheme.typography.titleLarge
          )*/
-    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(8.dp)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = modifier) {
         items(items = fileItems, key = { it.folderId }) { it ->
             FolderItem(it.folderName, it.fileList) {
                 onFolderClick(it.folderName, it.folderId)
@@ -63,14 +62,14 @@ fun FolderListScreen(
 }
 
 @Composable
-fun FileListScreen(folderName: String, fileItems: List<MediaItem>) {
+fun FileListScreen(folderName: String, fileItems: List<MediaItem>,modifier: Modifier) {
     Column {
         Text(
             folderName,
-            modifier = Modifier.padding(16.dp),
+            modifier = modifier,
             style = MaterialTheme.typography.titleLarge
         )
-        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(8.dp)) {
+        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
             items(items = fileItems) {
                 FileItem(it) {
                     // event required when item clicked
@@ -165,12 +164,16 @@ fun ShowLoading() {
     }
 }
 
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun ShowErrorContent(folderItems: FolderUiState) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+fun ShowErrorContent( modifier: Modifier = Modifier,
+    errorMessage: String = "Error Message!",
+) {
+    Box(modifier.padding(16.dp).fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
-            text = (folderItems as Error).message,
-            style = MaterialTheme.typography.displayLarge
+            modifier = Modifier.align(Alignment.Center),
+            text = errorMessage,
+            style = MaterialTheme.typography.titleMedium
         )
     }
 }
@@ -221,6 +224,6 @@ fun FolderListPreview(
         )
     )
 ) {
-    FolderListScreen(fileItems) { _, _ ->
+    FolderListScreen(fileItems,Modifier) { _, _ ->
     }
 }

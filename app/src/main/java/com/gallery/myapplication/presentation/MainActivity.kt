@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -14,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -24,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.setSingletonImageLoaderFactory
 import com.gallery.myapplication.R
 import com.gallery.myapplication.presentation.screen.MyNavigationScreen
+import com.gallery.myapplication.presentation.screen.ShowErrorContent
 import com.gallery.myapplication.ui.theme.MyApplicationTheme
 import com.gallery.myapplication.utils.CoilImageLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -34,23 +33,19 @@ class MainActivity : ComponentActivity() {
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 val granted = permissions.values.all { it }
-                if (granted) {
-                    setContent {
-                        val viewModel:MyGalleryViewModel by viewModel()
+                setContent {
+                    if (granted) {
                         setSingletonImageLoaderFactory { context ->
                             CoilImageLoader.getAsyncImageLoader(context)
                         }
                         MyApplicationTheme() {
-                            Scaffold(topBar = { TopAppBarDefaults() }) { innerPadding ->
-                                Surface(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(innerPadding)
-                                ) {
-                                    MyNavigationScreen(viewModel,Modifier)
-                                }
+                            val viewModel: MyGalleryViewModel by viewModel()
+                            Scaffold(topBar = { TopAppBarDefaults() }) { padding ->
+                                MyNavigationScreen(viewModel, Modifier.padding(padding))
                             }
                         }
+                    } else {
+                        ShowErrorContent(errorMessage = "Oops! Permission Denied, Close the Application, Go to Setting, Enable the Permission")
                     }
                 }
             }
