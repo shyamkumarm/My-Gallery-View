@@ -8,9 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.gallery.myapplication.FileUiState
-import com.gallery.myapplication.FolderUiState.Error
-import com.gallery.myapplication.FolderUiState.Success
+import com.gallery.myapplication.presentation.FileUiState
+import com.gallery.myapplication.presentation.FolderUiState.Error
+import com.gallery.myapplication.presentation.FolderUiState.Success
 import com.gallery.myapplication.presentation.MyGalleryViewModel
 import kotlinx.serialization.Serializable
 

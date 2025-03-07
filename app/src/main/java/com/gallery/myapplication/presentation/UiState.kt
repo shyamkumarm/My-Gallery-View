@@ -1,4 +1,4 @@
-package com.gallery.myapplication
+package com.gallery.myapplication.presentation
 
 import com.gallery.myapplication.domain.GalleryItem
 import com.gallery.myapplication.domain.MediaItem

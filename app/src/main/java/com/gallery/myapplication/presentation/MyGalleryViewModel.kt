@@ -2,8 +2,6 @@ package com.gallery.myapplication.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gallery.myapplication.FileUiState
-import com.gallery.myapplication.FolderUiState
 import com.gallery.myapplication.domain.MediaUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
