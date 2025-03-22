@@ -7,33 +7,33 @@ import java.util.UUID
 object TransformUtils {
 
     fun List<MediaItem>.transformToAll(): List<GalleryItem> {
-        return this.transformToImageItems() + this.transformToVideoItems() + this.transformToFolderItems()
+        return this.transformToFolderItems()
     }
 
-    public fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
+    private fun List<MediaItem>.transformToFolderItems(): List<GalleryItem> {
         return this.groupBy { it.folderPath }
             .map { (folderPath, mediaItems) ->
-                GalleryItem(folderPath, mediaItems[0].folderName, mediaItems.toMutableList())
+                GalleryItem(folderPath, mediaItems[0].folderName, mediaItems)
+            }.toMutableList().also {
+                it.add(0, transformToImageItems())
+                it.add(1, transformToVideoItems())
             }
     }
 
-    private fun List<MediaItem>.transformToImageItems(): List<GalleryItem> {
+    private fun List<MediaItem>.transformToImageItems(): GalleryItem {
         return this.filter {
             it.fileName.isImageFile()
-        }.groupBy { "All Images" }
-            .map { (folderName, mediaItems) ->
-                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
-            }
+        }.let { list ->
+            GalleryItem(UUID.randomUUID().toString(), "All Images", list)
+        }
     }
 
-    private fun List<MediaItem>.transformToVideoItems(): List<GalleryItem> {
+    private fun List<MediaItem>.transformToVideoItems(): GalleryItem {
         return this.filter {
             it.fileName.isVideoFile()
-        } // Add other video extensions as needed.
-            .groupBy { "All Videos" }
-            .map { (folderName, mediaItems) ->
-                GalleryItem(UUID.randomUUID().toString(), folderName, mediaItems.toMutableList())
-            }
+        }.let { list ->
+            GalleryItem(UUID.randomUUID().toString(), "All Videos", list)
+        }
     }
 
 
@@ -44,7 +44,7 @@ object TransformUtils {
     // Add other image extensions as needed
 
 
-   private fun String.isVideoFile() =
+    private fun String.isVideoFile() =
         this.endsWith(
             ".mp4",
             ignoreCase = true

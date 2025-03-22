@@ -1,7 +1,6 @@
 package com.gallery.myapplication.data
 
 import android.content.Context
-import android.database.Cursor
 import android.provider.MediaStore
 import com.gallery.myapplication.domain.MediaItem
 
@@ -9,9 +8,7 @@ class MediaSource(private val application: Context) {
 
 
     fun fetchMediaSource(): Result<List<MediaItem>> {
-
-        var cursor: Cursor? = null
-        try {
+        return Result.runCatching {
             val projection = arrayOf(
                 MediaStore.Files.FileColumns._ID,
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -24,7 +21,7 @@ class MediaSource(private val application: Context) {
                 MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
             )
             val sortOrder = "${MediaStore.MediaColumns.DATE_ADDED} DESC"
-            cursor = application.contentResolver.query(
+            val cursor = application.contentResolver.query(
                 MediaStore.Files.getContentUri("external"),
                 projection,
                 selection,
@@ -47,12 +44,7 @@ class MediaSource(private val application: Context) {
                     mediaMap.add(mediaItem)
                 }
             }
-            return Result.success(mediaMap)
-        } catch (e: Exception) {
-            return Result.failure(e)
-        } finally {
-            cursor?.close()
+            mediaMap
         }
-
     }
 }

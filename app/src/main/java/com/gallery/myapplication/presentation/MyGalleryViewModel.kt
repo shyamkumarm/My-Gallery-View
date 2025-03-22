@@ -2,6 +2,7 @@ package com.gallery.myapplication.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gallery.myapplication.domain.MediaItem
 import com.gallery.myapplication.domain.MediaUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,26 +18,26 @@ class MyGalleryViewModel(private val useCase: MediaUseCase) : ViewModel() {
         useCase.getFolderItems().collect { mediaState ->
             emit(mediaState)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FolderUiState.Loading)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), GalleryUiState.Loading)
 
 
     private val _fileItems =
-        MutableStateFlow<FileUiState>(FileUiState.Loading)
+        MutableStateFlow<GalleryUiState<List<MediaItem>>>(GalleryUiState.Loading)
     val fileItems = _fileItems.asStateFlow()
 
 
     fun getFileItems(folderId: String) {
         viewModelScope.launch {
-            _fileItems.emit(FileUiState.Loading)
+            _fileItems.emit(GalleryUiState.Loading)
             try {
                 useCase.getFileItems(
-                    (mediaItems.value as FolderUiState.Success).galleryItem,
+                    (mediaItems.value as GalleryUiState.Success).mediaItem,
                     folderId
                 ).collect { fileItems ->
-                    _fileItems.emit(fileItems)
+                    _fileItems.emit(GalleryUiState.Success(fileItems))
                 }
             } catch (e: Exception) {
-                _fileItems.emit(FileUiState.Error(e.message ?: "Some thing wrong or No Data"))
+                _fileItems.emit(GalleryUiState.Error(e.message ?: "Some thing wrong or No Data"))
             }
 
         }

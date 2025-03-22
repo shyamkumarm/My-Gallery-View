@@ -8,9 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.gallery.myapplication.presentation.FileUiState
-import com.gallery.myapplication.presentation.FolderUiState.Error
-import com.gallery.myapplication.presentation.FolderUiState.Success
+import com.gallery.myapplication.presentation.GalleryUiState
 import com.gallery.myapplication.presentation.MyGalleryViewModel
 import kotlinx.serialization.Serializable
 
@@ -29,30 +27,30 @@ fun MyNavigationScreen(
     ) {
         composable<MyGalleryScreen.FolderScreen> {
             when (folderItems) {
-                is Success -> {
-                    FolderListScreen(fileItems = (folderItems as Success).galleryItem,modifier)
+                is GalleryUiState.Success -> {
+                    FolderListScreen(fileItems = (folderItems as GalleryUiState.Success).mediaItem,modifier)
                     { selectedFolder, selectedId ->
                         viewModel.getFileItems(selectedId)
                         navController.navigate(MyGalleryScreen.FileScreen(selectedFolder))
                     }
                 }
-                is Error -> ShowErrorContent(errorMessage = (folderItems as Error).message)
+                is GalleryUiState.Error -> ShowErrorContent(errorMessage = (folderItems as GalleryUiState.Error).message)
                 else -> ShowLoading()
             }
 
         }
         composable<MyGalleryScreen.FileScreen> {
             when (fileItems) {
-                is FileUiState.Success -> {
+                is GalleryUiState.Success -> {
                     val folderName = it.toRoute<MyGalleryScreen.FileScreen>().folderName
                     FileListScreen(
                         folderName = folderName,
-                        fileItems = (fileItems as FileUiState.Success).mediaItem
+                        fileItems = (fileItems as GalleryUiState.Success).mediaItem
                         ,modifier = modifier
                     )
                 }
 
-                is FileUiState.Error -> ShowErrorContent(errorMessage = (fileItems as FileUiState.Error).message)
+                is GalleryUiState.Error -> ShowErrorContent(errorMessage = (fileItems as GalleryUiState.Error).message)
                 else -> ShowLoading()
             }
 
